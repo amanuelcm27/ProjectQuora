@@ -58,6 +58,7 @@ def create_or_show_profile(request, pk):
     show_profile = False
     profile_form = None
     profile_info = None
+    credentials = []
     try:
         profile_info = Profile.objects.get(user=user.id)
         show_profile = True
