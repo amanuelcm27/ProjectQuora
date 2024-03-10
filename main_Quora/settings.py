@@ -15,7 +15,8 @@ SECRET_KEY = 'django-insecure-3(27c#0gqrreut5i=bm+=2lcgtcdbxg+ji1u$(b(!+s6ads8s)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.up.railway.app']
+ALLOWED_HOSTS = ['quora-clone.up.railway.app']
+
 
 
 # Application definition
