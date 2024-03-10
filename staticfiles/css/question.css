@@ -1,0 +1,20 @@
+.flexrow { display: flex;
+         border: 2px black;}
+.flexrow > div { flex: 1; }
+        .infocell {
+         border: 2px solid green;
+         border-radius: 5px 25px;
+         background-color: white;
+         padding: 5px;
+         margin: 20px 5px 5px 5px;
+        }
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+  gap: 20px; /* Gap between columns */
+}
+
+.grid-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
