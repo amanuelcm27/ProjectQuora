@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-3(27c#0gqrreut5i=bm+=2lcgtcdbxg+ji1u$(b(!+s6ads8s)
 DEBUG = True
 
 ALLOWED_HOSTS = ['quora-clone.up.railway.app']
-
+CSRF_TRUSTED_ORIGINS = ['quora-clone.up.railway.app']
 
 
 # Application definition
