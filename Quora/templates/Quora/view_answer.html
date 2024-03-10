@@ -1,0 +1,211 @@
+{% extends 'main.html'%}
+{% block content %}
+{% load static %}
+
+
+<div class="row">
+    <div class="col-8">
+        <div style="margin:6px; padding:10px;">
+            <h2 style="font-size:1.6rem;font-weight:bold;">{{question.content}}</h2>
+            <a href="{%url 'answer' question.id %}">
+                <button type="submit" class="btn btn-white text-muted "
+                        style="border-color: silver;border-radius :35px;">
+                    <i class="fas fa-pen-to-square fa-lg"></i> Answer
+                </button>
+            </a>
+        </div>
+        {% for answer in answers %}
+        <div class="card">
+            <div class="card-body">
+                <p><small>
+                    <img src="{{answer.responder.profile_user.avatar.url}}" alt="Profile"
+                         class="rounded-circle "
+                         style="width:40px;height:40px ; border-radius:50%;object-fit:cover;">
+
+                    <a href="{% url 'profile' answer.responder.id %}">{{answer.responder.username}}</a>
+                    {% if answer.responder != request.user%}
+                    {% if answer.responder not in following %}
+                    <a class="follow-user" href="{% url 'follow' answer.responder.username 'follow' %}"
+                       data-follow-username="{{answer.responder.username}}" style="color:red;">
+                        follow
+                    </a>
+                    {% else %}
+                    <a class="follow-user" data-follow-username="{{answer.responder.username}}"
+                       href="{% url 'follow' answer.responder.username 'unfollow' %}" style="color:red;">
+                        unfollow
+                    </a>
+                    {% endif %}
+                    {% endif %}
+
+                </small>
+                </p>
+                <div style="margin:15px;">
+                    <p>{{answer.content|safe}}</p>
+                </div>
+                <small style="position: absolute; padding:3px; margin: 4px; top: 0; right: 0;">
+                    {% if request.user == answer.responder %}
+                    <a href="{% url 'edit_answer' answer.id %}">Edit</a>
+                    <a href="{% url 'delete_answer' answer.id 'delete'%}">Delete</a>
+                    {% endif %}
+                </small>
+                <button class="upvote-button btn btn-white text-muted" data-pk="{{answer.id}}" data-flag="upvote"
+                        type="submit"
+                        >
+                    <i class='fas fa-arrow-alt-circle-up'></i> Upvote
+                    <span id="upvote-count-{{ answer.id }}"> {{ answer.upvotes.count }}</span>
+                </button>
+                <button type="submit" class="downvote-button btn btn-white text-muted " data-pk="{{answer.id}}"
+                        data-flag="downvote"
+                        >
+                    <i class='fas fa-arrow-alt-circle-down'></i>
+                    <span id="downvote-count-{{ answer.id }}"> {{ answer.downvotes.count }}</span>
+                </button>
+                <button class="commentButton btn" data-target="comments-for-{{answer.id}}" type="button"
+                       >
+                    <span><i class="far fa-comment text-muted"></i> {{answer.comment_set.all.count}} </span>
+                </button>
+                <!--  comment and reply section begins -->
+                <div id="comments-for-{{answer.id}}" style="display:none; ">
+                    <!-- comment form and comments begin -->
+                    <form class="commentForm" id="comment-form-for-{{answer.id}}"
+                          data-answer-id="{{ answer.id }}" style="display:flex;align-items:center"
+                          method="post">
+                        {% csrf_token %}
+                        <textarea class="form-control auto-expand" rows="1"
+                                  placeholder="Add comment ..."
+                                  style="border-radius:20px; margin:15px;
+                                  overflow-y:hidden; resize:none;"
+                                  name="content" required></textarea>
+                        <button class="btn btn-primary" style="margin-left: 0px auto;border-radius:20px; "
+                                id="comment-button-{{answer.id}}" type="submit">Add comment
+                        </button>
+                    </form>
+
+                    {% for comment in answer.comment_set.all%}
+                    {% if not comment.reply %}
+
+                    <div class="comment-container" id="comment-container-for-{{comment.id}}" style="margin:25px 10px;">
+                        <p>
+                            <small><img src="{{comment.creator.profile_user.avatar.url}}"
+                                        alt="Profile"
+                                        class="rounded-circle"
+                                        style="width:30px;height:30px;border-radius:50%;object-fit:cover;">
+                            </small>
+                            <a href="{% url 'profile' comment.creator.id %}">{{comment.creator.username}}</a>-{{comment.date_created|timesince}}
+                            ago
+                        </p>
+                        <p class="card-text" id="content-for-{{comment.id}}" style="text-indent:30px;">
+                            {{comment.content}}</p>
+                        <!-- update comment form begin-->
+                        <div id="update-comment-for-{{comment.id}}" style="display:none;">
+                            <form id="update-comment-form-for-{{comment.id}}"
+                                  action="{% url 'edit_comment' comment.id  %}"
+                                  method="post"
+                                  style="display: flex;align-items:center;  ">
+                                {% csrf_token %}
+                                <textarea id="update-text-for-{{comment.id}}" class="form-control auto-expand" rows="1"
+                                          placeholder="Add reply ..."
+                                          style="border-radius:20px; margin:15px; overflow-y:hidden; resize:none;"
+                                          name="content"></textarea>
+                                <button id="update-button-{{comment.id}}" class="btn btn-primary"
+                                        style="margin-right:5px;border-radius:20px;"
+                                        type="submit">Update
+                                </button>
+                                <button id="cancel-form-{{comment.id}}"
+                                        class="btn btn-secondary"
+                                        style="margin-left:0px auto;border-radius:20px;">
+                                    Cancel
+                                </button>
+                            </form>
+                        </div>
+                        <!--update comment form end-->
+                        <div style="display:flex; background-color:white;">
+                            <button class="replyButton btn" data-target="reply-for-{{comment.id}}" type="button"
+                                    style="display:inline; border-radius:25px; margin-left:20px; ">Reply
+                            </button>
+                            <a href="#" class="json-link" data-comment-id="{{ comment.id }}">
+                                <button class="btn" style="border-radius:25px; margin-left:10px; ">View Replies</button>
+                            </a>
+                            <div class="menu-dropdown">
+                                <div class="menu-options" id="menu-for-{{comment.id}}">
+                                    <p class="edit" data-comment-id="{{comment.id}}">Edit comment</p>
+                                    <p class="delete" data-comment-id="{{comment.id}}">Delete</p>
+                                </div>
+                                {% if request.user == comment.creator %}
+                                <button class="btn menu-btn" id="{{comment.id}}">
+                                    <i class="fas fa-ellipsis"></i>
+                                </button>
+
+                                {% endif %}
+                            </div>
+                            <div class="delete-modal" id="delete-for-{{comment.id}}">
+                                <div class="modal-content">
+                                    <h4>Delete</h4>
+                                    <p>Are you sure you want to delete this comment?</p>
+                                    <button class="btn cancel-delete">Cancel</button>
+                                    <button class="btn confirm-delete" style="margin-top:10px;">Ok</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- comment form and comments end-->
+                        <!-- reply form begin-->
+                        <div id="reply-for-{{comment.id}}" style="display:none;">
+                            <form id="form-for-{{comment.id}}" action="{% url 'reply' comment.id answer.id %}"
+                                  method="post"
+                                  style="display: flex;align-items:center; ">
+                                {% csrf_token %}
+                                <textarea id="text-for-{{comment.id}}" class="form-control auto-expand" rows="1"
+                                          placeholder="Add reply ..."
+                                          style="border-radius:20px; margin:15px; overflow-y:hidden; resize:none;"
+                                          name="content"></textarea>
+                                <button id="button-{{comment.id}}" class="btn btn-primary"
+                                        style="margin-left:0px auto;border-radius:20px;"
+                                        type="submit">Reply
+                                </button>
+                            </form>
+                        </div>
+                        <!-- reply form end-->
+
+                        <!-- replies begin -->
+                        <div id="replies-{{comment.id}}" style="text-indent:50px;">
+
+                        </div>
+                        <!--replies end -->
+                    </div>
+
+                    {% endif %}
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <br>
+
+        {% empty %}
+        <div class="card " style="border:none;">
+            <div style="text-align:center;" class="card-body">
+                {{request.user.username}}
+                , can you answer this question?
+                <p>People are searching for an answer to this question.</p>
+                <a href="{%url 'answer' question.id %}">
+                    <button type="submit" class="btn btn-white text-muted "
+                            style="border-color: silver;border-radius :35px;">
+                        <i class="fas fa-pen-to-square fa-lg"></i> Answer
+                    </button>
+                </a>
+            </div>
+        </div>
+        {% endfor%}
+    </div>
+    <div class="col">
+        <p>Related Question</p>
+        <hr>
+    </div>
+
+</div>
+<script>
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'main.html'%}
+{% block content %}
+{% load static %}
+<br>
+
+<div class="row">
+    <div class="col-2">
+        <h6>Questions</h6>
+        <hr>
+        <a href="#">Questions for you</a><br>
+        <a href="{% url 'requested_answers' %}">Answer requests</a><br>
+        <a href="#">Drafts</a>
+    </div>
+    <div class="col-7">
+        {% for question in questions %}
+        <div class="card">
+            <div class="card-body">
+                <p><small><img src="{{question.creator.profile_user.avatar.url}}" alt="Profile"
+                               class="rounded-circle "
+                               style="width:40px; height:40px; border-radius:50%; object-fit:cover; ">
+                    <a href="{% url 'profile' question.creator.id %}">{{question.creator.username}}</a> requested your
+                    answer to this question</small></p>
+                <a href="{% url 'view_answer' question.content %}"><h5 class="card-title">{{question.content}}</h5></a>
+                <a href="{%url 'answer' question.id %}">
+                    <button type="submit" class="btn btn-white text-muted "
+                            style="border-color: silver;border-radius :35px;">
+                        <i class="fas fa-pen-to-square fa-lg"></i> Answer
+                    </button>
+                </a>
+            </div>
+        </div>
+        <br>
+        {% empty %}
+        <div class="card " style="border:none;">
+            <div class="card-body">
+                <br><br><br><br><br><br>
+                <img src="{% static 'images/mailbox.jpg'%}" alt="Profile"
+                     style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto;">
+                <h5 class="card-title text-secondary" style="text-align:center;">Answer Requests</h5>
+                <h6 class="text-secondary" style="text-align:center;">Ask for answers from other users by clicking
+                    Request
+                    Answer on a question.
+                    <br> Requests you receive will show up here. <br><br>
+                    <button type="submit" class="btn btn-primary text-white "
+                            style="text-align:center;border-radius :35px;">See Top Questions
+                    </button>
+                </h6>
+            </div>
+        </div>
+        {% endfor%}
+    </div>
+    <div class="col">
+        <p><b>Add topics you know about</b> <br>
+            Adding topics helps us find <br>questions for you to answer</p>
+        <button type="submit" class="btn btn-white text-primary "
+                style="border-color: blue;border-radius :35px;">Add
+            topic
+        </button>
+    </div>
+</div>
+{% endblock %}

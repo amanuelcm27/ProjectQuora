@@ -1,0 +1,137 @@
+{% extends 'main.html'%}
+{% block content %}
+{% load static %}
+<style>
+    button {
+        border:none;
+        border-radius: 5px;
+        padding:5px 13px;
+        margin-left:auto;
+        background-color:blue;
+        color:white;
+    }
+
+       a {
+        color:black;
+    }
+    a:hover {
+        color:black;
+    }
+    button:active {
+        background-color:red;
+    }
+    .question-form-container {
+        width:80%;
+        margin:0px auto;
+        border-radius:5px;
+
+    }
+    .question-form {
+        width:100%;
+        padding:10px;
+        resize:none;
+    }
+    label {
+        font-family:cursive;
+    }
+    small {
+        font-size:0.8rem;
+    }
+    .users-container {
+        width:100%;
+        display:flex;
+        flex-direction:column;
+    }
+    .user-choice {
+        display:flex;
+        align-items:center;
+        margin:10px 0px;
+        border:1px solid black;
+        padding:10px;
+    }
+    .choice-image {
+        width:40px;
+        height:40px;
+        border-radius:50%;
+        margin:10px;
+        object-fit:cover;
+    }
+
+    .tick {
+    margin-left:auto;
+    padding-right:30px;
+    }
+    .custom-checkbox {
+        font-size: 20px;
+        color: green;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+    /* Hide the default checkbox */
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    input[type="checkbox"]:checked + .custom-checkbox {
+        color: red;
+    }
+</style>
+<div>
+    <div class="question-form-container">
+
+        <form class="question-form" method="post" action="{% url 'question' %}">
+            {% csrf_token %}
+            <div style="display:flex; margin-left:auto;">
+                <button type="submit">Add Question</button>
+
+            </div>
+            <label for="question-content">Content: </label>
+            <textarea placeholder="Start your question with What, How, Why, etc."
+                      id="question-content"
+                      class="auto-expand question-form"
+                      required name="content"></textarea>
+            <label for="description"> Topic: <small>optional</small> </label>
+            <textarea placeholder="the topic the question is about ..." name="topic" id="description"
+                      class="auto-expand question-form"></textarea>
+            <div class="users-container">
+                {% for user in users %}
+                {% if user != request.user %}
+                <div class="user-choice">
+                    <img class="choice-image" src="{{user.profile_user.avatar.url}}" alt="">
+                    <span><a href="{% url 'profile' user.id %}">{{user.username}}</a></span>
+                    <span class="tick">
+                        <input type="checkbox"  name="to" value="{{ user.id }}" id="user_{{ user.id }}">
+                        <label for="user_{{ user.id }}" class="custom-checkbox">
+                            <i class="fas fa-paper-plane"></i>
+                        </label>
+                    </span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </form>
+
+    </div>
+
+
+</div>
+<script>
+    var textareas = document.querySelectorAll('.auto-expand');
+
+    textareas.forEach(function(textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    });
+</script>
+<!--<div>-->
+<!--    <form method="post">-->
+<!--        {% csrf_token %}-->
+<!--        {{form.as_p}}-->
+<!--        <button class="btn btn-warning" type="submit"> Done</button>-->
+
+<!--    </form>-->
+<!--</div>-->
+
+{% endblock %}

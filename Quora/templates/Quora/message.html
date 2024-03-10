@@ -1,0 +1,194 @@
+{% extends 'main.html'%}
+{% block content%}
+{% load static %}
+
+<div class="message-container">
+    <div class="message-container-left">
+        <div class="msg-head">
+            <span>Messages</span>
+            <button id="new-msg-1" class="new-btn"><i class="fas fa-pen "></i>New</button>
+        </div>
+        {% for interactor in interactors %}
+        <div data-person-id="{{interactor.id}}" data-person-name="{{interactor.username}}" class="person-container">
+            {% if interactor.receiver != request.user %}
+            <img class="chat-img" src="{{interactor.profile_user.avatar.url}}" alt="">
+            <span>{{interactor.username}}</span>
+            <span style="margin-left:auto"><small>Just Now</small></span>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="card " style="border:none;">
+            <div class="card-body">
+
+                <img src="{% static 'images/person.png'%}" alt="Profile"
+                     style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto; margin-top:50px;">
+                <h5 class="card-title text-secondary" style="text-align:center;">People you have sent to or received a
+                    message for will appear here</h5>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+    <div class="message-container-right">
+        <div style="display:none" class="msg-list-container">
+            <form action="{% url 'message' %}" method="post">
+                {% csrf_token %}
+                <div class="list-search-container">
+                    <input class="list-input" placeholder="Enter a name" required type="text" name="messageTo"
+                           list="username">
+                    <datalist id="username">
+                        {% for user in users %}
+                        <option value="{{user.username}}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="message-form-container">
+                    <textarea class="message-textarea" name="message" required placeholder="enter your message" id=""></textarea>
+                    <button class="send-btn">Send</button>
+                </div>
+            </form>
+        </div>
+
+        <div style="display:none" class="chat-container">
+            <div class="chat-header">
+                <span style="padding-top:40px">green you blue sender</span>
+            </div>
+            <div class="chat-content">
+
+            </div>
+
+            <div>
+                <form class="auto-expand" method="post" id="chat-msg-form">
+                    {% csrf_token %}
+                    <input id="receiver-input"  class="list-input" required type="hidden" name="messageTo" value="">
+                    <input class="message-input" required id="chat-input"  placeholder="Write a message ... " name="message" type="text">
+                    <button id="send-msg" class="send-btn">Send <i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+        <div class="card " style="border:none;">
+            <div class="card-body">
+
+                <img src="{% static 'images/mailbox.jpg'%}" alt="Profile"
+                     style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto; margin-top:150px;">
+                <h5 class="card-title text-secondary" style="text-align:center;">No Message Selected</h5>
+                <h6 class="text-secondary" style="text-align:center;">
+                    <br> Select an existing message, or start a new one. <br><br>
+                    <button type="submit" class="btn btn-primary text-white "
+                            id="new-msg-2" style="text-align:center;border-radius :35px;"><i
+                            class="fas fa-envelope"></i>New Messsage
+                    </button>
+                </h6>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const new_message_button = document.getElementById("new-msg-1");
+    const new_message_button2 = document.getElementById("new-msg-2");
+    const message_form = document.querySelector(".msg-list-container");
+    const card = document.querySelector(".card");
+    const chat_container = document.querySelector(".chat-container");
+    new_message_button.addEventListener("click",()=> {
+        message_form.style.display = "block";
+        card.style.display = "none";
+        chat_container.style.display ="none";
+
+    })
+    new_message_button2.addEventListener("click",()=> {
+        message_form.style.display = "block";
+        card.style.display = "none";
+        chat_container.style.display ="none";
+
+    })
+    const clicked_person = null;
+    const send_btn = document.getElementById("send-msg");
+    var container = document.querySelector(".chat-content");
+    var new_msg_div = document.createElement("div");
+    const msg_input = document.getElementById("receiver-input");
+    document.querySelectorAll(".person-container").forEach((person) => {
+        var person_id = person.getAttribute("data-person-id");
+        var person_name = person.getAttribute("data-person-name");
+        person.addEventListener("click",() => {
+            msg_input.value = person_name;
+            fetch(`/received_msg/${person_id}`)
+                .then(response => response.json())
+                .then(data => {
+                let prevPerson = null;
+                data.messages.forEach(message=> {
+                    var child = document.createElement("div");
+                    if (prevPerson !== person_id) {
+                        container.innerHTML = ""
+
+                        if (person_id == message.receiver_id) {
+                            child.innerHTML = `<span id="${person_id}" class="chat-message"
+                            style="background-color:green;">${message.content}
+                            <sub><small>${message.date_created}</small></sub></span>`
+                        }
+                        else {
+                            child.innerHTML = `<span id="${person_id}" class="chat-message">${message.content}
+                            <sub><small>${message.date_created}</small></sub></span>`
+
+                        }
+                        container.appendChild(child)
+                        chat_container.style.display ="block";
+                        message_form.style.display ="none";
+                        card.style.display = "none";
+                        prevPerson = person_id;
+                    }
+                    else {
+                        if (person_id == message.receiver_id) {
+                            child.innerHTML = `<span id="${person_id}"
+                            class="chat-message" style="background-color:green;">${message.content}
+                            <sub><small>${message.date_created}</small></sub></span>`
+                        }
+                        else {
+                            child.innerHTML = `<span id="${person_id}" class="chat-message">${message.content}
+                            <sub><small>${message.date_created}</small></sub></span>`
+
+                        }
+                        container.appendChild(child)
+                        chat_container.style.display ="block";
+                        message_form.style.display ="none";
+                        card.style.display = "none"; }
+                })
+            })
+
+        })
+
+
+    })
+    send_btn.addEventListener("click",()=> {
+        event.preventDefault();
+        var form = document.getElementById("chat-msg-form")
+        var formData = new FormData(form);
+        if (!form.checkValidity()) {
+            console.log("Form is not valid");
+            return;
+        }
+        else {
+            fetch(``, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'), // Include CSRF token in the headers
+                },
+                body: formData
+            }).then(response => response.json())
+                .then(data => {
+                if (data.fail !== 1) {
+                    new_msg_div.innerHTML += `<span id="${data.message_id}" class="chat-message"
+                            style="background-color:green;">${data.message}
+                            <sub><small>${data.date_created}</small></sub></span>`
+                    container.appendChild(new_msg_div);
+                    form.reset();
+
+                }
+            })
+        }
+
+    })
+
+</script>
+{% endblock %}

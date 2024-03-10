@@ -1,0 +1,52 @@
+{% extends 'main.html'%}
+{% block content %}
+{% load static %}
+<style>
+    .search-container {
+        width:70%;
+        margin:0px auto;
+    }
+    .search-header {
+        font-weight:bold;
+        font-size:1.2rem;
+        padding:8px;
+        margin:5px;
+
+    }
+    .search-card {
+        width:100%;
+        border:1px solid silver;
+        border-bottom:none;
+        padding:15px;
+    }
+
+</style>
+<div class="search-container">
+    <div class="search-header">
+        Results for {{search_term}}
+    </div>
+    {% for result in search_results %}
+    <div class="search-card">
+        <a href="{% url 'view_answer' result.content %}"><h5>{{result.content}}</h5></a>
+        <p>
+            <small>
+                {{result.answer_set.all.count}} answer Last Followed
+                {{result.date_created|date:'M j, Y'}}
+            </small>
+        </p>
+    </div>
+    {% empty %}
+    <div class="search-card">
+        <div>
+            <div class="card-body">
+                <img src="{% static 'images/mailbox.jpg'%}" alt="Profile"
+                     style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto; margin-top:150px;">
+                <h5 class="card-title text-secondary" style="text-align:center;">Oops nothing found try to refine your search
+                </h5>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

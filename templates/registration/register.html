@@ -1,0 +1,8 @@
+{% extends 'main.html'%}
+{% block content %}
+<form method="post" >
+    {% csrf_token %}
+    {{form.as_p}}
+    <button class="btn btn-danger">Register</button>
+</form>
+{% endblock %}

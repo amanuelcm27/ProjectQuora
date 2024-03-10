@@ -1,0 +1,64 @@
+{% extends 'main.html'%}
+{% block content %}
+{% load static %}
+
+
+<div class="container">
+    <br>
+    <br>
+    <h3><b><a href="{% url 'view_answer' question.content %}">{{question.content}}</a></b></h3>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form.content.errors}}
+        {{ form.content }}
+        <br>
+        <a href="javascript:history.back()" class="btn btn-warning">Cancel</a>
+        <button type="submit" class="btn btn-danger">Post</button>
+
+    </form>
+
+</div>
+{{form.media}}
+<script>
+    document.getElementById('id_images').addEventListener('change', function () {
+        const selectedImages = document.getElementById('selected-images');
+
+        for (let i = 0; i < this.files.length; i++) {
+            const file = this.files[i];
+            const image = document.createElement('img');
+            image.src = URL.createObjectURL(file);
+            image.width = 500; // Set the desired image width
+            selectedImages.appendChild(image);
+        }
+    });
+</script>
+
+<!--<div class="container">-->
+<!--    <br>-->
+<!--    <h3><b>{{question.content}}</b></h3>-->
+<!--<form method="post" enctype="multipart/form-data">-->
+<!--    {% csrf_token %}-->
+<!--    <textarea name="content" cols="40" rows="10" class="form-control" required id="id_content">-->
+<!--        -->
+<!--</textarea>-->
+<!--    <input class="form-control" type="file" name="images" id="image-input" multiple>-->
+<!--    <div id="image-preview"></div>-->
+<!--    <button type="submit">Submit</button>-->
+<!--</form>-->
+
+<!--<script>-->
+<!--    document.getElementById('image-input').addEventListener('change', function () {-->
+<!--        const preview = document.getElementById('image-preview');-->
+<!--        preview.innerHTML = '';-->
+
+<!--        for (let i = 0; i < this.files.length; i++) {-->
+<!--            const file = this.files[i];-->
+<!--            const image = document.createElement('img');-->
+<!--            image.src = URL.createObjectURL(file);-->
+<!--            image.width = 600; // Set the desired image width-->
+<!--            preview.appendChild(image);-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+{% endblock %}

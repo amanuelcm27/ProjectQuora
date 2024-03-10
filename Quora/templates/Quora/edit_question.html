@@ -1,0 +1,47 @@
+{% extends 'main.html'%}
+{% block content%}
+
+<div>
+    {% if flag == 'edit' %}
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Question</h5>
+
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{form.content.label}}
+                    {{form.content}}
+                    {{form.errors}}
+                    <br>
+                    <a href="javascript:history.back()" style="text-decoration:none;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </a>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    {% else %}
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle2">Delete Question</h5>
+
+            </div>
+            <div class="modal-body">
+                <h2 class="text-danger">Are you sure you want to delete? </h2>
+                <a href="javascript:history.back()" style="text-decoration:none;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </a>
+                <a href="{% url 'delete_question' question.id 'confirm' %}" ><button class="btn btn-primary">Confirm</button> </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

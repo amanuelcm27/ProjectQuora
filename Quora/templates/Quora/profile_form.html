@@ -1,0 +1,385 @@
+{% extends 'main.html'%}
+{% block content%}
+{% load static %}
+<style>
+    .profile-container {
+        display:grid;
+        grid-template-columns:1.5fr 1fr;
+    }
+    .profile-micro {
+        display:flex;
+        width:100%;
+    }
+    .profile-name {
+        font-size:2rem;
+        font-weight:bold;
+        vertical-align:text-top;
+        margin:6px;
+    }
+    .profile-image {
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        object-fit:cover;
+        margin:6px;
+    }
+    .sub-context {
+        font-weight:normal;
+        font-size:1rem;
+    }
+    ul {
+        margin-left:0px;}
+    .stat-list {
+        list-style:none;
+        display:inline;
+        font-family:cursive;
+        padding:10px;
+        margin:0;
+        cursor:pointer;
+    }
+    .stat-list:hover {
+        background-color:#eeeeee;
+    }
+    .profile-stats {
+        margin-top:50px;
+        margin-left:0px;
+        width:100%;
+    }
+    .stats-container {
+        display:flex;
+        border-top: 2px solid silver;
+        border-bottom: 2px solid silver;
+        margin:10px;
+
+    }
+    .starters {
+        font-size:1rem;
+        font-family:cursive;
+        margin:20px;
+    }
+    .filter {
+        margin:20px;
+        margin-left:auto;
+    }
+    .profile-side {
+        margin:10px;
+    }
+    .credential-list {
+        padding:10px;
+        list-style:none;
+    }
+    i {
+        padding:10px;
+    }
+    .stats-card {
+        display: flex;
+        flex-direction:column;
+        margin:20px;
+    }
+    .card {
+        margin-bottom:10px;
+        border-top: 1px solid silver;
+        border-bottom: 1px solid silver;
+    }
+    a {
+        color:black;
+    }
+    a:hover {
+        color:black;
+    }
+    .profile-image-sub{
+        width:40px; height:40px; border-radius:50%; object-fit:cover;
+    }
+</style>
+{% if show_profile %}
+<div class="profile-container">
+    <div class="profile-details-container">
+        <div class="profile-micro">
+            <img class="profile-image" src="{{  profile_info.avatar.url }}" alt="">
+            <span class="profile-name"> {{profile_info.name}}
+                <p class="sub-context">
+                    {{profile_info.bio}}
+                </p>
+                <p class="sub-context">{{followers.count}} followers - {{following.count}} following
+                </p>
+            </span>
+        </div>
+        <div class="profile-details">
+            <div class="profile-stats">
+                <ul>
+                    <li id="profile-list" class="stat-list">Profile</li>
+                    <li id="answer-list" class="stat-list">Answers</li>
+                    <li id="question-list" class="stat-list">Question</li>
+                    <li id="follower-list" class="stat-list">Followers</li>
+                    <li id="following-list" class="stat-list">Following</li>
+                </ul>
+            </div>
+            <div class="stats-container">
+                <span id="list-identify" class="starters">Profile</span>
+            </div>
+            <div class="stats-card">
+                <div id="question">
+                    {% for question in questions %}
+                    <div class="card">
+                        <div class="card-body">
+                            <p><small><img src="{{  profile_info.avatar.url }}" alt="Profile"
+                                           class="profile-image-sub"
+                            >
+                                <a href="{% url 'profile' question.creator.id %}"><span>{{profile_info.name}}</span></a>
+                            </small></p>
+                            <a href="{% url 'view_answer' question.content %}"><h5>{{question.content}}</h5></a>
+                            {% if request.user == question.creator %}
+                            <a style="color:#733873" href="{% url 'edit_question' question.id 'edit' %}">Edit</a>
+                            <a style="color:#853d85" href="{% url 'delete_question' question.id 'delete' %}">Delete</a>
+                            {% endif %}
+
+                            <p><small>{{question.answer_set.all.count}} answer Last Followed
+                                {{question.date_created|date:'M j, Y'}} </small></p>
+                            <a href="{%url 'answer' question.id %}">
+                                <button type="submit" class="btn btn-white text-muted "
+                                        style="border-color: silver;border-radius :35px;">
+                                    <i class="fas fa-pen-to-square fa-lg"></i> Answer
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="border:none;">
+                        <div class="card-body">
+                            <img src="{% static 'images/mailbox.jpg'%}" alt="Profile"
+                                 style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto; margin-top:150px;">
+                            <h5 class="card-title text-secondary" style="text-align:center;">No Questions asked Yet
+                            </h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="display:none" id="answer">
+                    {% for answer in answers %}
+                    <div class="card">
+                        <div class="card-body">
+                            <p><small><img src="{{answer.responder.profile_user.avatar.url}}" alt="Profile"
+                                           class="profile-image-sub"
+                            >
+                                <a href="{% url 'profile' answer.responder.id %}">{{answer.responder.username}}</a>
+                            </small>
+                            </p>
+                            <a href="{% url 'view_answer' answer.question.content %}"><p
+                                    style="font-size:1.5rem;font-weight:bold;">{{answer.question.content}}</p></a>
+                            <h5 class="card-title" style="font-size:1rem;font-weight:normal;">
+                                {{answer.content|safe}}</h5>
+                            <small style="position: absolute; padding:3px; margin: 4px; top: 0; right: 0;">
+                                {% if request.user == answer.responder %}
+                                <a href="{% url 'edit_answer' answer.id %}">Edit</a>
+                                <a href="{% url 'delete_answer' answer.id 'delete'%}">Delete</a>
+                                {% endif %}
+                            </small>
+                            <button class="upvote-button btn btn-white text-muted" data-pk="{{answer.id}}"
+                                    data-flag="upvote"
+                                    type="submit"
+                                    style="border-color: silver;border-radius :35px;padding:2px; margin-right:0px;">
+                                <i class='fas fa-arrow-alt-circle-up'></i> Upvote
+                                <span id="upvote-count-{{ answer.id }}" style=" padding-right:10px; "> {{ answer.upvotes.count }}</span>
+                            </button>
+                            <button type="submit" class="downvote-button btn btn-white text-muted "
+                                    data-pk="{{answer.id}}"
+                                    data-flag="downvote"
+                                    style="margin-left:0px; padding:2px; border-color: silver;border-radius :35px;">
+                                <i class='fas fa-arrow-alt-circle-down'></i>
+                                <span id="downvote-count-{{ answer.id }}" style=" padding-right:10px; "> {{ answer.downvotes.count }}</span>
+                            </button>
+
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="border:none;">
+                        <div class="card-body">
+                            <img src="{% static 'images/mailbox.jpg'%}" alt="Profile"
+                                 style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto; margin-top:150px;">
+                            <h5 class="card-title text-secondary" style="text-align:center;">You haven't answered a
+                                Question
+                                Yet</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="display:none" id="follower">
+                    {% for followerObj in followers %}
+                    <div class="card">
+                        <div class="card-body">
+                            <p>
+                                <small>
+                                    <img src="{{followerObj.follower.profile_user.avatar.url}}" alt="Profile"
+                                         class="profile-image-sub "
+                                         style="width:50px ;height:50px; border-radius:50%;object-fit:cover;">
+                                    <a href="{%url 'profile' followerObj.follower.id %}" style="font-size:1rem;">
+                                        <span>{{followerObj.follower.username}}</span>
+                                    </a>
+                                </small>
+                            </p>
+                            <small>since {{followerObj.date_followed|date:'M j,Y'}}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="border:none;">
+                        <div class="card-body">
+                            <img src="{% static 'images/mailbox.jpg'%}" alt="Profile"
+                                 style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto; margin-top:150px;">
+                            <h5 class="card-title text-secondary" style="text-align:center;">No Followers Yet</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="display:none" id="following">
+                    {% for followingObj in following %}
+                    <div class="card">
+                        <div class="card-body">
+                            <p>
+                                <small>
+                                    <img src="{{followingObj.followee.profile_user.avatar.url}}" alt="Profile"
+                                         class="profile-image-sub "
+                                         style="width:50px ;height:50px; border-radius:50%;object-fit:cover;">
+                                    <a href="{%url 'profile' followingObj.followee.id %}"><span>{{followingObj.followee.username}}</span></a>
+                                </small>
+                            </p>
+                            <small>Following since {{followingObj.date_followed|date:'M j,Y'}}</small>
+
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="border:none;">
+                        <div class="card-body">
+                            <img src="{% static 'images/mailbox.jpg'%}" alt="Profile"
+                                 style="max-width: 100px; max-height: 200px; display: block; margin: 0 auto; margin-top:150px;">
+                            <h5 class="card-title text-secondary" style="text-align:center;">Not Following anyone
+                                Yet</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="profile-side">
+        <span class="starters">Credentials & Highlights</span>
+        <span>
+        <ul>
+            {% for credential in credentials %}
+                <li class="credential-list">
+                    <i class="{{ credential.icon }}"></i>
+                    <span style="color:red">{{ credential.label }}</span>: {{ credential.value|default:"N/a" }}
+                    {% if request.user == profile_info.user  %}
+                        <a href="{% url 'edit_profile' request.user.id %}">Edit</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </span>
+        <hr>
+    </div>
+
+</div>
+{% else %}
+<div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ profile_form.as_p}}
+        <button class="btn btn-warning" type="submit">Save</button>
+    </form>
+</div>
+{% endif %}
+
+<script>
+    const profile_list = document.getElementById("profile-list");
+    const answer_list = document.getElementById("answer-list");
+    const question_list = document.getElementById("question-list");
+    const follower_list = document.getElementById("follower-list");
+    const following_list = document.getElementById("following-list");
+    const answer_div = document.getElementById("answer");
+    const question_div = document.getElementById("question");
+    const follower_div = document.getElementById("follower");
+    const following_div = document.getElementById("following");
+    const list_identify = document.getElementById("list-identify")
+    profile_list.addEventListener("click",(e)=> {
+        list_identify.textContent = "Profile"
+        question_div.style.display = "block";
+        answer_div.style.display = "none";
+        follower_div.style.display = "none";
+        following_div.style.display = "none";
+    })
+    answer_list.addEventListener("click",()=> {
+        list_identify.textContent = "Answer"
+
+        question_div.style.display = "none";
+        answer_div.style.display = "block";
+        follower_div.style.display = "none";
+        following_div.style.display = "none";
+    })
+    question_list.addEventListener("click",()=> {
+        list_identify.textContent = "Question"
+
+        question_div.style.display = "block";
+        answer_div.style.display = "none";
+        follower_div.style.display = "none";
+        following_div.style.display = "none";
+    })
+    follower_list.addEventListener("click",()=> {
+        list_identify.textContent = "Followers"
+        question_div.style.display = "none";
+        answer_div.style.display = "none";
+        follower_div.style.display = "block";
+        following_div.style.display = "none";
+    })
+    following_list.addEventListener("click",()=> {
+        list_identify.textContent = "Following"
+        question_div.style.display = "none";
+        answer_div.style.display = "none";
+        follower_div.style.display = "none";
+        following_div.style.display = "block";
+    })
+
+
+</script>
+<!--<div class="container">-->
+<!--    <div class="row">-->
+<!--        <div class="col-8">-->
+<!--            {% if show_profile %}-->
+
+<!--            <div>-->
+<!--                <div class="profile-header">-->
+<!--                    <img src="{{ profile_info.avatar.url }}" class="rounded-circle"-->
+<!--                         style="object-fit: cover; border-radius: 50%; max-width: 200px;max-height:200px;-->
+<!--                         vertical-align: text-top;"-->
+<!--                         alt="profile picture"> <span></span>-->
+<!--                <h4>Questions</h4>-->
+<!--                {% for question in questions %}-->
+<!--                    <a href="{% url 'view_answer' question.content %}" class="text-danger">{{question.content}}</a>-->
+<!--                    <a href="{% url 'edit_question' question.id 'edit' %}">Edit</a>-->
+<!--                    <a href="{% url 'delete_question' question.id 'delete' %}">Delete</a>-->
+<!--                <br>-->
+<!--&lt;!&ndash;                    <input type="text" value="{% comment %}{% url ''  %}" {% endcomment %} id="link-to-copy" readonly>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button id="copy-button">Copy Link</button>&ndash;&gt;-->
+<!--                {% endfor %}-->
+<!--            </div>-->
+<!--            {% else %}-->
+<!--            <div>-->
+<!--                <form method="post" enctype="multipart/form-data">-->
+<!--                    {% csrf_token %}-->
+<!--                    {{ profile_form.as_p}}-->
+<!--                    <button class="btn btn-warning" type="submit">Save</button>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--            {% endif %}-->
+<!--        </div>-->
+<!--        <div class="col">-->
+<!--            <h5 style="text-align: right;">Credential & Highlights</h5>-->
+<!--            <hr>-->
+<!--        </div>-->
+
+<!--    </div>-->
+
+
+<!--</div>-->
+
+
+{% endblock %}

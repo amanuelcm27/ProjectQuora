@@ -1,0 +1,59 @@
+{% extends 'main.html'%}
+{% block content%}
+{% load static %}
+<div class="container">
+    <div class="grid-container">
+        <div class="col1">
+            <div class="user-spaces">
+                <span class="head">Your spaces</span>
+                <button class="create-space-btn">Create a Space</button>
+                <button class="create-space-btn">Discover spaces</button>
+                <ul class="space-list">
+                    {% for space in spaces %}
+                    {% if request.user in space.follow.all %}
+                    <li class="space">{{space.name}}
+                        <!--                        <a href="{% url 'follow_space' space.id %}">Follow Space</a>-->
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="discover">
+                <p class="title">Discover Spaces</p>
+                <p style="font-weight:bold">spaces you might like</p>
+                <div class="flex-space-container">
+                    {% for space in spaces %}
+                    {% if request.user not in space.follow.all %}
+                    <div class="flex-card">
+                        <img class="card-img" src="{% static 'images/quora.jpg'%}" alt="">
+                        <p class="space-name">{{space.name}}</p>
+                        <span style="padding:10px;"  class="space-description">{{space.description}}</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col2">
+            <span class="head">Pending invites <hr></span>
+            <p style="margin-left:10px;">From people you don't follow</p>
+            <div class="invites">
+                <img style="width:35px;height:35px;border-radius: 35px;" src="dashimages.png" alt="">
+                <span style="margin-left:8px;">Hacker space</span>
+            </div>
+            <div class="invites">
+                <img style="width:35px;height:35px;border-radius: 35px;" src="dashimages.png" alt="">
+                <span style="margin-left:8px;">Hacker space</span>
+            </div>
+            <div class="invites">
+                <img style="width:35px;height:35px;border-radius: 35px;" src="dashimages.png" alt="">
+                <span style="margin-left:8px;">Hacker space</span>
+            </div>
+            <div class="invites">
+                <img style="width:35px;height:35px;border-radius: 35px;" src="dashimages.png" alt="">
+                <span style="margin-left:8px;">Hacker space</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

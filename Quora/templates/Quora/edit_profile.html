@@ -1,0 +1,23 @@
+{% extends 'main.html'%}
+{% block content %}
+{% load static %}
+<style>
+    #avatar-clear_id {
+        display:none;
+    }
+    label[for="avatar-clear_id"] {
+        display:none;
+    }
+</style>
+<div>
+    <form style="margin-bottom:50px;" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p}}
+        {{ form.errors }}
+        <a style="text-decoration:none;" href="javascript:history.back()">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </a>
+        <button class="btn btn-warning" type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}

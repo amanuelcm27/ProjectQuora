@@ -1,0 +1,25 @@
+{% extends 'main.html'%}
+{% block content %}
+{% load static %}
+
+<div class="flexrow">
+    <div class="infocell">
+        <form action="{% url 'accounts:login' %}" method="post">
+            {% csrf_token %}
+            <p>
+                <label for="id_username">Email:</label>
+                <input class="form-control"
+                       type="text" name="username" autofocus autocapitalize="none" autocomplete="username"
+                       maxlength="254" required id="id_username">
+            </p>
+            <p>
+                <label for="id_password">Password:</label>
+                <input class="form-control" type="password" name="password" autocomplete="current-password" required id="id_password">
+            </p>
+
+            <button class="form-control btn btn-danger">Login</button>
+        </form>
+        <p class="form-control"> Don't have an account yet ? <a href="{% url 'register'%}">Register</a></p>
+    </div>
+</div>
+{% endblock %}

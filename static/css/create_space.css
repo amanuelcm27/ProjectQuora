@@ -1,0 +1,70 @@
+
+.space-container {
+        background-color:rgba(0, 0, 0, 0.8);
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 20px;
+        width:100vw;
+        height:100vh;
+        z-index:4000;
+        display:none;
+        align-items:center;
+        justify-content:center;
+}
+.space-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Full height of the viewport */
+
+    font-family: sans-serif;
+}
+
+.form-box {
+    background-color: #fffefe; /* Darker background color for the form box */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(4, 4, 4, 0.5); /* Optional: Add a box shadow for depth */
+}
+
+.space-form {
+    display: flex;
+    flex-direction: column;
+    width: 550px;
+}
+
+label {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+span {
+    margin-bottom:10px ;
+}
+.space-desc {
+    font-size: small;
+    color:rgb(113, 112, 112)
+}
+input {
+    padding: 8px;
+    margin-bottom: 40px;
+}
+
+.space-btn {
+    padding: 15px;
+    background-color: rgb(0, 13, 255); /* Customize button color */
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.space-btn:hover {
+    background-color: #d00; /* Change color on hover */
+}
+.fas {
+    cursor:pointer;
+}
